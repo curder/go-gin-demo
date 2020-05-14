@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/curder/go-gin-demo/models"
 	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
 )
 
 var DB *gorm.DB
@@ -23,13 +24,13 @@ func InitDB() (db *gorm.DB) {
 		err  error
 	)
 
-	driverName = "mysql"
-	host = "localhost"
-	port = 33060
-	database = "go_gin_demo"
-	user = "root"
-	password = "root"
-	charset = "utf8"
+	driverName = viper.GetString("database.driverName")
+	host = viper.GetString("database.host")
+	port = viper.GetInt("database.port")
+	database = viper.GetString("database.database")
+	user = viper.GetString("database.user")
+	password = viper.GetString("database.password")
+	charset = viper.GetString("database.charset")
 	args = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
 		user,
 		password,
