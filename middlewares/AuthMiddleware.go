@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/curder/go-gin-demo/commons"
 	"github.com/curder/go-gin-demo/models"
+	"github.com/curder/go-gin-demo/responses"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -26,7 +27,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证 tokenString
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": http.StatusUnauthorized, "message": "权限不足"})
+			responses.Response(ctx, http.StatusUnauthorized, http.StatusUnauthorized, nil, "权限不足")
 			ctx.Abort()
 			return
 		}
@@ -34,7 +35,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString = tokenString[7:] // 获取传入的 token 有效部分，除去"Bearer "后的字符
 
 		if token, claims, err = commons.ParseToken(tokenString); err != nil || !token.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": http.StatusUnauthorized, "message": "权限不足"})
+			responses.Response(ctx, http.StatusUnauthorized, http.StatusUnauthorized, nil, "权限不足")
 			ctx.Abort()
 			return
 		}
@@ -46,7 +47,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		DB.First(&user, userID)
 		// 用户不存在
 		if user.ID == 0 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"code": http.StatusUnauthorized, "message": "权限不足"})
+			responses.Response(ctx, http.StatusUnauthorized, http.StatusUnauthorized, nil, "权限不足")
 			ctx.Abort()
 			return
 		}
