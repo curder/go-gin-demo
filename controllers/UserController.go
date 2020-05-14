@@ -6,6 +6,7 @@ import (
 	"github.com/curder/go-gin-demo/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
 )
 
@@ -59,12 +60,13 @@ func Register(ctx *gin.Context) {
 
 	// 返回结果
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": http.StatusOK,
+		"code":    http.StatusOK,
 		"message": "注册成功",
-		"data": gin.H{},
+		"data":    gin.H{},
 	})
 }
 
+// 用户登录
 func Login(ctx *gin.Context) {
 	var (
 		phone    string
@@ -102,7 +104,11 @@ func Login(ctx *gin.Context) {
 	}
 
 	// 生成token
-	token = "token122"
+	if token, err = commons.ReleaseToken(user); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": "用户token生成失败"})
+		log.Printf("token generate error: %v", err)
+		return
+	}
 
 	// 返回结果
 	ctx.JSON(http.StatusOK, gin.H{
@@ -110,4 +116,18 @@ func Login(ctx *gin.Context) {
 		"message": "登录成功",
 		"data":    gin.H{"token": token},
 	})
+}
+
+// 用户信息
+func UserInfo(ctx *gin.Context) {
+	var (
+		user   interface{}
+		exists bool
+	)
+	if user, exists = ctx.Get(`user`); !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": http.StatusUnauthorized, "message": "没有操作权限"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": gin.H{"user": user}})
 }
