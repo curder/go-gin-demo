@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/curder/go-gin-demo/commons"
 	"github.com/curder/go-gin-demo/models"
+	"github.com/curder/go-gin-demo/resources"
 	"github.com/curder/go-gin-demo/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -129,5 +130,5 @@ func UserInfo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": gin.H{"user": user}})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "data": gin.H{"user": resources.ToUserResource(user.(models.Users))}})
 }
