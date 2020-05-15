@@ -5,6 +5,7 @@ import (
 	"github.com/curder/go-gin-demo/models"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"net/url"
 )
 
 var DB *gorm.DB
@@ -19,6 +20,7 @@ func InitDB() (db *gorm.DB) {
 		user       string
 		password   string
 		charset    string
+		local      string
 
 		args string
 		err  error
@@ -31,14 +33,18 @@ func InitDB() (db *gorm.DB) {
 	user = viper.GetString("database.user")
 	password = viper.GetString("database.password")
 	charset = viper.GetString("database.charset")
-	args = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true",
+	local = viper.GetString("database.local")
+
+	args = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=%s",
 		user,
 		password,
 		host,
 		port,
 		database,
 		charset,
+		url.QueryEscape(local),
 	)
+
 	if db, err = gorm.Open(driverName, args); err != nil {
 		panic("failed to connect database,err: " + err.Error())
 	}

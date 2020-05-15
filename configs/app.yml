@@ -9,3 +9,4 @@ database:
   user: root
   password: root
   charset: utf8
+  local: Asia/Shanghai
