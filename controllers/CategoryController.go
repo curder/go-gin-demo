@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/curder/go-gin-demo/commons"
 	"github.com/curder/go-gin-demo/models"
 	"github.com/curder/go-gin-demo/responses"
+	"github.com/curder/go-gin-demo/validations"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
@@ -39,40 +39,34 @@ func (c CategoryController) Index(ctx *gin.Context) {
 }
 
 // 添加
-func (c CategoryController) Store(ctx *gin.Context) {
+func (c CategoryController) Create(ctx *gin.Context) {
 	var (
-		requestCategory models.Category
+		requestCategory validations.CreateCategoryValidation
+		category        models.Category
 		err             error
 	)
 
-	if err = ctx.Bind(&requestCategory); err != nil {
-		fmt.Printf("request bind err: %s", err.Error())
-		return
-	}
-
-	if requestCategory.Name == "" {
+	if err = ctx.ShouldBind(&requestCategory); err != nil {
 		responses.Response(ctx, http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, gin.H{}, "数据验证错误，分类名称必须提供")
 		return
 	}
 
-	c.DB.Create(&requestCategory)
 
-	responses.Success(ctx, gin.H{"category": requestCategory}, "创建分类成功")
+	category = models.Category{Name: requestCategory.Name}
+	c.DB.Create(&category)
+
+	responses.Success(ctx, gin.H{"category": category}, "创建分类成功")
 }
 
 // 更新
 func (c CategoryController) Update(ctx *gin.Context) {
 	var (
-		requestCategory models.Category
+		requestCategory validations.CreateCategoryValidation
 		categoryID      int
 		updateCategory  models.Category
 		err             error
 	)
-
-	// 获取请求主体中的参数
-	_ = ctx.Bind(&requestCategory)
-
-	if requestCategory.Name == "" {
+	if err = ctx.ShouldBind(&requestCategory); err != nil {
 		responses.Response(ctx, http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, gin.H{}, "数据验证错误，分类名称必须提供")
 		return
 	}

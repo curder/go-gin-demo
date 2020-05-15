@@ -20,7 +20,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	categoryRouters = r.Group("/api/categories")              // 路由分组
 	categoryController = controllers.NewCategoryController()  // 获取分类控制器实例
 	categoryRouters.GET("", categoryController.Index)         // 分类列表
-	categoryRouters.POST("", categoryController.Store)        // 创建分类
+	categoryRouters.POST("", categoryController.Create)        // 创建分类
 	categoryRouters.PUT("/:id", categoryController.Update)    // 更新分类
 	categoryRouters.GET("/:id", categoryController.Show)      // 查看分类
 	categoryRouters.DELETE("/:id", categoryController.Delete) // 删除分类
