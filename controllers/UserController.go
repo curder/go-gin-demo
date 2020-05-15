@@ -15,17 +15,21 @@ import (
 // 注册
 func Register(ctx *gin.Context) {
 	var (
+		requestUser    models.Users
 		name           string
 		phone          string
 		password       string
 		user           models.Users
 		hashedPassword []byte
 		err            error
+		token          string
 	)
+
 	// 获取参数
-	name = ctx.PostForm("name")
-	phone = ctx.PostForm("phone")
-	password = ctx.PostForm("password")
+	_ = ctx.Bind(&requestUser)
+	name = requestUser.Name
+	phone = requestUser.Phone
+	password = requestUser.Password
 
 	// 验证数据
 	if len(phone) != 11 {
@@ -60,8 +64,15 @@ func Register(ctx *gin.Context) {
 	}
 	commons.DB.Create(&user)
 
+	// 生成token
+	if token, err = commons.ReleaseToken(user); err != nil {
+		responses.Response(ctx, http.StatusInternalServerError, http.StatusInternalServerError, nil, "用户token生成失败")
+		log.Printf("token generate error: %v", err)
+		return
+	}
+
 	// 返回结果
-	responses.Success(ctx, gin.H{}, "注册成功")
+	responses.Success(ctx, gin.H{"token": token}, "注册成功")
 }
 
 // 用户登录
@@ -74,8 +85,9 @@ func Login(ctx *gin.Context) {
 		token    string
 	)
 	// 获取参数
-	phone = ctx.PostForm("phone")
-	password = ctx.PostForm("password")
+	_ = ctx.Bind(&user)
+	phone = user.Phone
+	password = user.Password
 
 	// 数据验证
 	if len(phone) != 11 {
